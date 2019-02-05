@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+</head>
+
+<body>
+  <div class="header">Header</div>
+  <button class="load-bar-btn">Load!</button>
+  <div class="main">
+  </div>
+  <script>
+    window.onload = function () {
+      const loadBtn = document.querySelector('.load-bar-btn');
+      const main = document.querySelector('.main');
+      // when button is clicked, add loading bar to dom
+      // animate the loading bar
+
+      class Closure {
+        constructor() {
+          this.queue = [];
+          this.animating = false;
+          this.addLoadingBar = this.addLoadingBar.bind(this);
+          this.addToQueue = this.addToQueue.bind(this);
+          this.emptyQueue = this.emptyQueue.bind(this);
+          this.animateLoadingBar = this.animateLoadingBar.bind(this);
+        }
+
+        addLoadingBar() {
+          var newLoadingBar = document.createElement('div');
+          var loadingBarContent = document.createElement('div');
+          newLoadingBar.classList.add('loading-bar-container');
+          loadingBarContent.classList.add('loading-bar-inner');
+          newLoadingBar.appendChild(loadingBarContent);
+          main.append(newLoadingBar);
+          this.addToQueue(loadingBarContent);
+        }
+
+        addToQueue(loadingBarContent) {
+          this.queue.push(loadingBarContent);
+          this.emptyQueue();
+        }
+
+        emptyQueue() {
+          console.log('emptying queue');
+          if (this.queue.length > 0 && !this.animating) {
+            let item = this.queue.shift();
+            this.animateLoadingBar(item, this.emptyQueue);
+          }
+        }
+
+        animateLoadingBar(loadingBar, done) {
+          var self = this;
+          let width = 0;
+          this.animating = true;
+
+          (function frame() {
+            if (width >= 100) {
+              self.animating = false;
+              done();
+            } else {
+              width += 1;
+              loadingBar.style.width = width + '%';
+              window.requestAnimationFrame(frame);
+            }
+          })();
+
+        }
+      }
+
+      var closure = new Closure();
+
+      loadBtn.addEventListener('click', closure.addLoadingBar);
+
+      // if button is clicked while animation is occurring
+      // add another loading bar underneath, but don't load it
+
+      // when the animation is not occurring, load the bar;
+      // queue up loading bars
+      // if done is called, animate next
+    }
+  </script>
+</body>
+
+</html>
